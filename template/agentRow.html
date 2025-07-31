@@ -1,0 +1,48 @@
+<!-- {{ range .Agents }}
+<tr class="fade-in">
+  <td><input type="checkbox" class="checkbox" /></td>
+  <td><strong>{{ .Code }}</strong></td>
+  <td>{{ .Nom }}</td>
+  <td>{{ .Date }}</td>
+  <td>
+    <div class="payment-method">
+      <div class="card-icon gpay">G</div>
+      <span>•••• {{ .CardLast4 }}<br /><small>Exp {{ .CardExp }}</small></span>
+    </div>
+  </td>
+  <td><span class="amount">{{ .Montant }}</span></td>
+  <td>
+    <span class="status-badge status-{{ .StatusClass }}"
+      >{{ .StatusText }}</span
+    >
+  </td>
+  <td>
+    <div class="actions">
+      <button
+        class="action-btn edit-btn"
+        onclick="openModal('edit', '{{ .Code }}')"
+      >
+        <i class="fas fa-edit"></i>
+      </button>
+      <button
+        class="action-btn delete-btn"
+        hx-delete="/transaction/{{ .Code }}"
+        hx-confirm="Êtes-vous sûr de vouloir supprimer cette transaction ?"
+      >
+        <i class="fas fa-trash"></i>
+      </button>
+    </div>
+  </td>
+</tr>
+{{ end }} -->
+
+{{ define "agentRow" }} {{ range .Agents }}
+<tr>
+  <td>{{ .Nom }}</td>
+  <td>{{ .Prenoms }}</td>
+  <td>{{ .Poste }}</td>
+  <td>{{ .Agence }}</td>
+  <td>{{ .Region }}</td>
+  <td>{{ .Email }}</td>
+</tr>
+{{ end }} {{ end }}

@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Transactions Manager</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/htmx/1.9.10/htmx.min.js"></script>
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/static/style.css" />
+  </head>
+  <body>
+    <div class="container">
+      <div class="header">
+        <div class="header-content">
+          <h1><i class="fas fa-credit-card"></i> Transactions</h1>
+          <div class="htmx-indicator">
+            <div class="loading-spinner"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="controls">
+        <div class="search-container">
+          <i class="fas fa-search search-icon"></i>
+          <input
+            type="text"
+            class="search-input"
+            placeholder="Rechercher des transactions..."
+            hx-post="/search"
+            hx-target="#transactions-table"
+            hx-trigger="keyup changed delay:300ms"
+          />
+        </div>
+
+        <button class="btn btn-secondary">
+          <i class="fas fa-filter"></i> Filtres
+        </button>
+
+        <button class="btn btn-primary" onclick="openModal('add')">
+          <i class="fas fa-plus"></i> Ajouter manuellement
+        </button>
+      </div>
+
+      <div class="table-container">
+        <table class="table" id="transactions-table">
+          <thead>
+            <tr>
+              <th><input type="checkbox" class="checkbox" /></th>
+               <tr>
+            <th>Nom</th>
+            <th>Prénoms</th>
+            <th>Poste</th>
+            <th>Agence</th>
+            <th>Région</th>
+            <th>Email</th>
+      </tr>
+            </tr>
+          </thead>
+          <tbody>
+            {{ template "agentRow" . }}
+          </tbody>
+        </table>
+      </div>
+
+      <div class="pagination">
+        <button
+          class="page-btn"
+          hx-get="/transactions?page=1"
+          hx-target="#transactions-table"
+        >
+          <i class="fas fa-chevron-left"></i>
+        </button>
+        <button class="page-btn active">1</button>
+        <button
+          class="page-btn"
+          hx-get="/transactions?page=2"
+          hx-target="#transactions-table"
+        >
+          2
+        </button>
+        <button class="page-btn">...</button>
+        <button
+          class="page-btn"
+          hx-get="/transactions?page=7"
+          hx-target="#transactions-table"
+        >
+          7
+        </button>
+        <button
+          class="page-btn"
+          hx-get="/transactions?page=8"
+          hx-target="#transactions-table"
+        >
+          8
+        </button>
+        <button
+          class="page-btn"
+          hx-get="/transactions?page=2"
+          hx-target="#transactions-table"
+        >
+          <i class="fas fa-chevron-right"></i>
+        </button>
+      </div>
+    </div>
+
+    <!-- Modal pour ajouter/modifier une transaction -->
+    <div id="transaction-modal" class="modal">
+      <div class="modal-content">
+        <h2 id="modal-title">Ajouter une transaction</h2>
+        <form
+          hx-post="/transaction"
+          hx-target="#transactions-table"
+          hx-swap="beforeend"
+        >
+          <div class="form-group">
+            <label class="form-label">Nom complet du client</label>
+            <input
+              type="text"
+              class="form-input"
+              name="customer_name"
+              required
+            />
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Montant</label>
+            <input
+              type="number"
+              class="form-input"
+              name="amount"
+              step="0.01"
+              required
+            />
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Méthode de paiement</label>
+            <select class="form-select" name="payment_method" required>
+              <option value="">Sélectionner...</option>
+              <option value="visa">Visa</option>
+              <option value="mastercard">Mastercard</option>
+              <option value="gpay">Google Pay</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Statut</label>
+            <select class="form-select" name="status" required>
+              <option value="">Sélectionner...</option>
+              <option value="completed">Terminé</option>
+              <option value="pending">En attente</option>
+            </select>
+          </div>
+
+          <div class="form-actions">
+            <button
+              type="button"
+              class="btn btn-secondary"
+              onclick="closeModal()"
+            >
+              Annuler
+            </button>
+            <button type="submit" class="btn btn-primary">
+              <i class="fas fa-save"></i> Enregistrer
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <script>
+      function openModal(type, transactionId = null) {
+        const modal = document.getElementById("transaction-modal");
+        const title = document.getElementById("modal-title");
+
+        if (type === "add") {
+          title.textContent = "Ajouter une transaction";
+          // Reset form
+          modal.querySelector("form").reset();
+        } else if (type === "edit") {
+          title.textContent = "Modifier la transaction";
+          // Here you would populate the form with existing data
+          // This would typically come from an HTMX request
+        }
+
+        modal.classList.add("show");
+      }
+
+      function closeModal() {
+        document.getElementById("transaction-modal").classList.remove("show");
+      }
+
+      // Close modal when clicking outside
+      document
+        .getElementById("transaction-modal")
+        .addEventListener("click", function (e) {
+          if (e.target === this) {
+            closeModal();
+          }
+        });
+
+      // Simulate HTMX responses for demo purposes
+      document.body.addEventListener("htmx:beforeRequest", function (e) {
+        console.log("HTMX Request:", e.detail.requestConfig);
+      });
+
+      document.body.addEventListener("htmx:afterRequest", function (e) {
+        if (e.detail.successful) {
+          closeModal();
+        }
+      });
+
+      // Add some interactivity for demo
+      document.querySelectorAll(".checkbox").forEach((checkbox) => {
+        checkbox.addEventListener("change", function () {
+          const row = this.closest("tr");
+          if (this.checked) {
+            row.style.background = "#eff6ff";
+          } else {
+            row.style.background = "";
+          }
+        });
+      });
+    </script>
+  </body>
+</html>
