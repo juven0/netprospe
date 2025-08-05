@@ -50,6 +50,8 @@
             <tr>
               <th><input type="checkbox" class="checkbox" /></th>
                <tr>
+            <th></th>
+            <th>Matricule</th>
             <th>Nom</th>
             <th>Prénoms</th>
             <th>Poste</th>
@@ -116,9 +118,12 @@
           hx-target="#transactions-table"
           hx-swap="beforeend"
         >
-          <div class="form-group">
-            <label class="form-label">Nom complet du client</label>
+          
+          <div class="section-form">
+            <div class="form-group">
+            <label class="form-label">Nom</label>
             <input
+              id="customer_name"
               type="text"
               class="form-input"
               name="customer_name"
@@ -127,33 +132,62 @@
           </div>
 
           <div class="form-group">
-            <label class="form-label">Montant</label>
+            <label class="form-label">Prenoms</label>
             <input
-              type="number"
+              id="customer_lastname"
+              type="text"
               class="form-input"
-              name="amount"
-              step="0.01"
+              name="customer_lastname"
+              required
+            />
+          </div>
+          </div>
+
+          <div class="section-form">
+          <div class="form-group">
+            <label class="form-label">Poste</label>
+            <input
+              id="customer_post"
+              type="text"
+              class="form-input"
+              name="customer_post"
               required
             />
           </div>
 
-          <div class="form-group">
-            <label class="form-label">Méthode de paiement</label>
-            <select class="form-select" name="payment_method" required>
-              <option value="">Sélectionner...</option>
-              <option value="visa">Visa</option>
-              <option value="mastercard">Mastercard</option>
-              <option value="gpay">Google Pay</option>
-            </select>
+           <div class="form-group">
+            <label class="form-label">Agence</label>
+            <input
+              id="customer_agence"
+              type="text"
+              class="form-input"
+              name="customer_agence"
+              required
+            />
           </div>
 
-          <div class="form-group">
-            <label class="form-label">Statut</label>
-            <select class="form-select" name="status" required>
-              <option value="">Sélectionner...</option>
-              <option value="completed">Terminé</option>
-              <option value="pending">En attente</option>
-            </select>
+           <div class="form-group">
+            <label class="form-label">Region</label>
+            <input
+              id="customer_region"
+              type="text"
+              class="form-input"
+              name="customer_region"
+              required
+            />
+          </div>
+          </div>
+          
+
+           <div class="form-group">
+            <label class="form-label">Mail</label>
+            <input
+              id="customer_mail"
+              type="text"
+              class="form-input"
+              name="customer_mail"
+              required
+            />
           </div>
 
           <div class="form-actions">
@@ -173,18 +207,29 @@
     </div>
 
     <script>
-      function openModal(type, transactionId = null) {
+      function openModal(type, name, lasteName, post, agence, region, mail) {
+        console.log(name)
         const modal = document.getElementById("transaction-modal");
         const title = document.getElementById("modal-title");
+        const input_name = document.getElementById("customer_name")
+        const input_lastName = document.getElementById("customer_lastname")
+        const input_post = document.getElementById("customer_post")
+        const input_agence = document.getElementById("customer_agence")
+        const input_region = document.getElementById("customer_region")
+        const input_mail = document.getElementById("customer_mail")
 
         if (type === "add") {
           title.textContent = "Ajouter une transaction";
-          // Reset form
+         
           modal.querySelector("form").reset();
         } else if (type === "edit") {
           title.textContent = "Modifier la transaction";
-          // Here you would populate the form with existing data
-          // This would typically come from an HTMX request
+          input_name.value = name
+          input_lastName.value = lasteName
+          input_post.value = post
+          input_agence.value = agence
+          input_region.value = region
+          input_mail.value = mail
         }
 
         modal.classList.add("show");
@@ -194,7 +239,6 @@
         document.getElementById("transaction-modal").classList.remove("show");
       }
 
-      // Close modal when clicking outside
       document
         .getElementById("transaction-modal")
         .addEventListener("click", function (e) {
@@ -203,7 +247,6 @@
           }
         });
 
-      // Simulate HTMX responses for demo purposes
       document.body.addEventListener("htmx:beforeRequest", function (e) {
         console.log("HTMX Request:", e.detail.requestConfig);
       });
@@ -214,7 +257,6 @@
         }
       });
 
-      // Add some interactivity for demo
       document.querySelectorAll(".checkbox").forEach((checkbox) => {
         checkbox.addEventListener("change", function () {
           const row = this.closest("tr");
